@@ -1,3 +1,4 @@
+from time import sleep
 import cv2
 import mediapipe as mp
 import drawing_styles as ds
@@ -24,8 +25,10 @@ def gestoEsPapel(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
         return True
     return False
 
-def gestoEsTijera(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
-    if ((indxp > indxt) and (corzp > corzt) and (anlp < anlt) and (meñp < meñt)):
+def gestoEsTijera(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
+    if ((muñeca > corzp) and (indxp > indxt) and (corzp > corzt) and (anlp < anlt) and (meñp < meñt)):
+        return True
+    if ((muñeca < corzp) and (indxp < indxt) and (corzp < corzt) and (anlp > anlt) and (meñp > meñt)):
         return True
     return False
 
@@ -72,7 +75,7 @@ with mp_hands.Hands(
                 txt = 'Piedra'
             if (gestoEsPapel(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
                 txt = 'Papel'
-            if (gestoEsTijera(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
+            if (gestoEsTijera(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
                 txt = 'Tijera'
                     
             # Mostrar la imagen vista por la camara
@@ -84,7 +87,7 @@ with mp_hands.Hands(
                 ds.get_hand_connections_style(txt)
             )
             cv2.imshow('IAPPT', cv2.flip(image,1))
-
+            
 
         # Detener programa al pulsar 'Esc'
         if cv2.waitKey(5) & 0xFF == 27:
