@@ -1,17 +1,16 @@
 import cv2
 import mediapipe as mp
+import drawing_styles as ds
 
 mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles  # estilos del formato
-mp_hands = mp.solutions.hands  # modelo usado
+# mp_drawing_styles = ds.  # estilos del formato
+mp_hands = mp.solutions.hands  # seleccionar el modelo que usaremos
 
-# For webcam input:
+# Entrada de video por webcam:
 camara = cv2.VideoCapture(0)
 
-'''
-Estas funciones determinan si el gesto 
-toma como parametro las posiciones las llemas de los dedos y los nudillos
-'''
+# Estas funciones determinan si el gesto 
+# toma como parametro las posiciones las llemas de los dedos y los nudillos
 def gestoEsPiedra(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
     if ((indxp < indxt) and (corzp < corzt) and (anlp < anlt) and (meñp < meñt)):
         return True
@@ -30,7 +29,6 @@ def gestoEsTijera(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
 
 with mp_hands.Hands(
         model_complexity = 0,
-        static_image_mode = True,
         max_num_hands = 1,
         min_detection_confidence = 0.5,
         min_tracking_confidence = 0.5) as hands:
@@ -52,7 +50,8 @@ with mp_hands.Hands(
 
 
         if results.multi_hand_landmarks:
-            mano = results.multi_hand_landmarks[0] # usamos solo el 1º elemento encontrado ya que solo trabajaremos con una mano a la vez
+             # usamos solo el 1º elemento encontrado ya que solo trabajaremos con una mano a la vez
+            mano = results.multi_hand_landmarks[0]
             # TODO explicar esto en doc
             indxp = mano.landmark[6].y  
             indxt = mano.landmark[8].y  
@@ -63,7 +62,7 @@ with mp_hands.Hands(
             meñp = mano.landmark[18].y  
             meñt = mano.landmark[20].y  
             txt = ''
-            
+
             if (gestoEsPiedra(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
                 txt = 'Piedra'
             if (gestoEsPapel(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
@@ -71,15 +70,15 @@ with mp_hands.Hands(
             if (gestoEsTijera(indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
                 txt = 'Tijera'
               
-            nueva_imagen = cv2.putText (image, txt, (200,200), cv2.FONT_HERSHEY_DUPLEX, 2.0, (0,0,0), 1)
+            #cv2.putText(image, txt, (200,200), cv2.FONT_HERSHEY_DUPLEX, 2, (0,0,0), 2)
             
             # Mostrar la imagen vista por la camara
             mp_drawing.draw_landmarks(
                 image,
                 mano,
                 mp_hands.HAND_CONNECTIONS,
-                mp_drawing_styles.get_default_hand_landmarks_style(),
-                mp_drawing_styles.get_default_hand_connections_style()
+                ds.get_hand_landmarks_style(txt),
+                ds.get_hand_connections_style(txt)
             )
             cv2.imshow('IAPPT', image)
 
