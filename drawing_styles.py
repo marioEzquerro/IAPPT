@@ -202,7 +202,7 @@ _HAND_CONNECTION_STYLE_SCISSORS = {
 }
 
 
-def get_hand_landmarks_style(txt) -> Mapping[int, DrawingSpec]:
+def get_hand_landmarks_style(accion) -> Mapping[int, DrawingSpec]:
     """Returns the default hand landmarks drawing style.
 
     Returns:
@@ -211,11 +211,11 @@ def get_hand_landmarks_style(txt) -> Mapping[int, DrawingSpec]:
     hand_landmark_style = {}
     global hand_landmarks
 
-    if (txt == 'Piedra'):
+    if (accion == 1):
         hand_landmarks = _HAND_LANDMARK_STYLE_ROCK
-    elif (txt == 'Papel'):
+    elif (accion == 2):
         hand_landmarks = _HAND_LANDMARK_STYLE_PAPER
-    elif (txt == 'Tijera'):
+    elif (accion == 3):
         hand_landmarks = _HAND_LANDMARK_STYLE_SCISSORS
     else:
         hand_landmarks = _HAND_LANDMARK_STYLE
@@ -226,7 +226,7 @@ def get_hand_landmarks_style(txt) -> Mapping[int, DrawingSpec]:
     return hand_landmark_style
 
 
-def get_hand_connections_style(txt) -> Mapping[Tuple[int, int], DrawingSpec]:
+def get_hand_connections_style(accion) -> Mapping[Tuple[int, int], DrawingSpec]:
     """Returns the default hand connections drawing style.
 
     Returns:
@@ -235,11 +235,11 @@ def get_hand_connections_style(txt) -> Mapping[Tuple[int, int], DrawingSpec]:
     hand_connection_style = {}
     global hand_connections
 
-    if (txt == 'Piedra'):
+    if (accion == 1):
         hand_connections = _HAND_CONNECTION_STYLE_ROCK
-    elif (txt == 'Papel'):
+    elif (accion == 2):
         hand_connections = _HAND_CONNECTION_STYLE_PAPER
-    elif (txt == 'Tijera'):
+    elif (accion == 3):
         hand_connections = _HAND_CONNECTION_STYLE_SCISSORS
     else:
         hand_connections = _HAND_CONNECTION_STYLE

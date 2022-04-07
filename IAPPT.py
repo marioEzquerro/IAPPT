@@ -1,3 +1,4 @@
+import random
 from time import sleep
 import cv2
 import mediapipe as mp
@@ -32,6 +33,24 @@ def gestoEsTijera(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)
         return True
     return False
 
+def gestocpuInpt(usrInpt):
+    cpuInpt =  random.randrange(1,3)
+    if usrInpt == 1 and cpuInpt == 3:
+        return 'Usuario gana!'
+    elif usrInpt == 1 and cpuInpt == 2:
+        return 'CPU gana'
+    elif usrInpt == 2 and cpuInpt == 1:
+        return 'Usuario gana!'
+    elif usrInpt == 2 and cpuInpt == 3:
+        return 'CPU gana', cpuInpt
+    elif usrInpt == 3 and cpuInpt == 2:
+        return 'Usuario gana!'
+    elif usrInpt == 3 and cpuInpt == 1:
+        return 'CPU gana'
+    elif usrInpt == cpuInpt:
+        return 'Draw'
+    
+
 
 with mp_hands.Hands(
         static_image_mode = False,
@@ -41,19 +60,15 @@ with mp_hands.Hands(
         min_tracking_confidence = 0.5) as hands:
 
     while camara.isOpened():
-        success, image = camara.read()
+        success, img = camara.read()
+
         if not success:
             print("Camara no detectada")
-            continue
+            break
 
-        # Convertimos la imagen de BGR opencv a RGB usado en mediapipe 
-        image.flags.writeable = False
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = hands.process(image)
-
-        # Draw the hand annotations on the image.
-        image.flags.writeable = True
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        # Convertimos la imgn de BGR opencv a RGB usado en mediapipe 
+        img.flags.writeable = False
+        results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
 
 
         if results.multi_hand_landmarks:
@@ -70,28 +85,30 @@ with mp_hands.Hands(
             meñp = mano.landmark[18].y  
             meñt = mano.landmark[20].y  
             txt = ''
+            global accion
 
-            if (gestoEsPiedra(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
-                txt = 'Piedra'
-            if (gestoEsPapel(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
-                txt = 'Papel'
-            if (gestoEsTijera(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt)):
-                txt = 'Tijera'
-                    
+            if gestoEsPiedra(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
+                accion = 1
+            if gestoEsPapel(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
+                accion = 2
+            if gestoEsTijera(muñeca, indxp, indxt, corzp, corzt, anlp, anlt, meñp, meñt):
+                accion = 3
+
             # Mostrar la imagen vista por la camara
             mp_drawing.draw_landmarks(
-                image,
+                img,
                 mano,
                 mp_hands.HAND_CONNECTIONS,
-                ds.get_hand_landmarks_style(txt),
-                ds.get_hand_connections_style(txt)
+                ds.get_hand_landmarks_style(accion),
+                ds.get_hand_connections_style(accion)
             )
-            cv2.imshow('IAPPT', cv2.flip(image,1))
+            cv2.imshow('IAPPT', cv2.flip(img,1))
             
-
-        # Detener programa al pulsar 'Esc'
-        if cv2.waitKey(5) & 0xFF == 27:
-            break
+            # Detener programa al pulsar 'Esc'
+            if cv2.waitKey(5) & 0xFF == 27:
+                break
+            elif cv2.waitKey(1) & 0xFF == ord('c'):
+                gestocpuInpt(txt)
 
 camara.release()
 cv2.destroyAllWindows()
