@@ -1,12 +1,17 @@
-import numpy as np
+import csv
 import os
 import cv2
 import mediapipe as mp
 from keras.preprocessing.image import ImageDataGenerator
 
+
 mp_hands = mp.solutions.hands
 TRAINING_FOLDERS = ['.\\data\\train\\paper', '.\\data\\train\\scissors', '.\\data\\train\\rock']
 TESTIING_FOLDERS = ['.\\data\\test\\paper', '.\\data\\test\\scissors', '.\\data\\test\\rock']
+ROCK = 1
+PAPER = 2
+SCISSORS = 3
+
 images = []
 
 # Creamos un objeto del tipo ImageDataGenerator para transformar imagenes
@@ -15,69 +20,67 @@ images = []
 #     horizontal_flip=True,
 #     fill_mode='nearest')
 
+# Añadir todas las imagenes a la lista
 def loadTrainingImages():
-    # Añadir todas las imagenes a la lista
     for folder in TRAINING_FOLDERS:
         for file in os.listdir(folder):
-            full_path = os.path.join(folder, file)
-            if ".DS_Store" not in full_path:
-                images.append(full_path)
+                images.append(os.path.join(folder, file))
     saveData('training_data.csv')
     
 def loadTestingImages():
-    # Añadir todas las imagenes a la lista
     for folder in TESTIING_FOLDERS:
         for file in os.listdir(folder):
-            full_path = os.path.join(folder, file)
-            if ".DS_Store" not in full_path:
-                images.append(full_path)
-    saveData('testing_data.csv')
+            images.append(os.path.join(folder, file))
+    saveData('eval_data.csv')
     
-
+# leer landmarks y guardarlas
 def saveData(name):
-    print('Generando csv...')
-    csv = []
+    print('Generando csv...')   
     with mp_hands.Hands(
             static_image_mode = True,
             model_complexity = 0,
             max_num_hands = 1,
             min_detection_confidence = 0.5) as hands:
+        
+        # abrimos archivo para escribir en él 
+        with open(name, 'w') as df:
+            writer = csv.writer(df, delimiter=',', lineterminator='\n')
+            # escribimos los nombres de los campos
+            writer.writerow(['gesto', 'indicep_Y','indicep_X','indicet_Y','indicet_X','corazonp_Y','corazonp_X', 'corazont_Y','corazont_X', 'anularp_Y','anularp_X', 'anulart_Y','anulart_X', 'meniquep_Y','meniquep_X','meniquet_Y','meniquet_X'])
 
-        for idx, file in enumerate(images):
-            print(f'Convertiendo: {file}')
-            # Leer imagen y voltear horizontalmente 
-            img = cv2.flip(cv2.imread(file), 1)
-            # Convertir de BGR a RGB antes de procesar
-            results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-            
-            if 'rock' in file:
-                figura = 1
-            elif 'paper' in file:
-                figura = 2
-            elif 'scissors' in file:
-                figura = 3
-            else: 
-                figura = 0
+            for idx, file in enumerate(images):
+                print(f'Convirtiendo: {file}')
+                # Leer imagen y voltear horizontalmente 
+                img = cv2.flip(cv2.imread(file), 1)
+                # Convertir de BGR a RGB antes de procesar
+                results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+                
+                # determinar que imagen se esta procesando via el path en el que esta guardado
+                if 'rock' in file:
+                    action = ROCK
+                elif 'paper' in file:
+                    action = PAPER
+                else: 
+                    action = SCISSORS
 
-            # Print handedness and draw hand landmarks on the image
-            if results.multi_hand_landmarks:
-                # Usamos solo el primer elemento del array que contiene las manos encontradas
-                mano = results.multi_hand_landmarks[0]
-            
-                csv.append([
-                    figura, mano.landmark[0].y, mano.landmark[0].x, 
-                    mano.landmark[6].y, mano.landmark[6].x,
-                    mano.landmark[8].y, mano.landmark[8].x, 
-                    mano.landmark[10].y, mano.landmark[10].x, 
-                    mano.landmark[12].y, mano.landmark[12].x, 
-                    mano.landmark[14].y, mano.landmark[14].x,
-                    mano.landmark[16].y, mano.landmark[16].x,
-                    mano.landmark[18].y, mano.landmark[18].x, 
-                    mano.landmark[20].y, mano.landmark[20].x
-                ])
-    # Guardar todos los datos en csv
-    np.savetxt(name, csv, delimiter =", ", fmt ='% s')
-
+                if results.multi_hand_landmarks:
+                    # Usamos solo el primer elemento del array que contiene las manos encontradas
+                    hand = results.multi_hand_landmarks[0]
+                    
+                    # Escribir landmarks de la mano
+                    writer.writerow([action,
+                        hand.landmark[0].y, hand.landmark[0].x, 
+                        hand.landmark[6].y, hand.landmark[6].x,
+                        hand.landmark[8].y, hand.landmark[8].x,
+                        hand.landmark[10].y, hand.landmark[10].x,
+                        hand.landmark[12].y, hand.landmark[12].x,
+                        hand.landmark[14].y, hand.landmark[14].x,
+                        hand.landmark[16].y, hand.landmark[16].x,
+                        hand.landmark[18].y, hand.landmark[18].x,
+                        hand.landmark[20].y, hand.landmark[20].x
+                    ])
+        
+       
 def main():
     opc = input('\n--- Selecciona opcion ---\n1. Generar csv para el entrenamiento\n2. Generar csv de testing\n3. Salir\n> ')
     
