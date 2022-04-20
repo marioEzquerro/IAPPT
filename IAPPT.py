@@ -102,13 +102,15 @@ with mp_hands.Hands(
                 ds.get_hand_landmarks_style(accion),
                 ds.get_hand_connections_style(accion)
             )
-            cv2.imshow('IAPPT', cv2.flip(img,1))
             
             # Detener programa al pulsar 'Esc'
             if cv2.waitKey(5) & 0xFF == 27:
                 break
-            elif cv2.waitKey(1) & 0xFF == ord('c'):
+            
+            if cv2.waitKey(1) & 0xFF == ord('c'):
                 gestocpuInpt(txt)
+        
+        cv2.imshow('IAPPT', cv2.flip(img,1))
 
 camara.release()
 cv2.destroyAllWindows()

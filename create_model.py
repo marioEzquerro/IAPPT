@@ -1,44 +1,48 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
 import tensorflow as tf
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import os
-from keras import datasets, layers, models
-from tensorflow import keras
-from keras.models import Sequential
-from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
-from keras.preprocessing import image
-from keras.utils import np_utils
 
-NUMERIC_COLUMNS = ['gesto', 'indicep_Y','indicep_X','indicet_Y','indicet_X','corazonp_Y','corazonp_X', 'corazont_Y','corazont_X', 'anularp_Y','anularp_X', 'anulart_Y','anulart_X', 'meniquep_Y','meniquep_X','meniquet_Y','meniquet_X']
-dtrain = pd.read_csv('training_data.csv', names=NUMERIC_COLUMNS)
-deval = pd.read_csv('eval_data.csv')
-y_train = dtrain.pop('gesto')
-y_eval = deval.pop('gesto')
+COLUMNS = ['gesto','muneca_Y','muneca_X','indicep_Y','indicep_X','indicet_Y','indicet_X','corazonp_Y','corazonp_X','corazont_Y','corazont_X','anularp_Y','anularp_X','anulart_Y','anulart_X','meniquep_Y','meniquep_X','meniquet_Y','meniquet_X']
+# train_path = tf.keras.utils.get_file("training_data.csv", "https://drive.google.com/file/d/12PQlDCw7lwUxyt9er0U0SqEklaQO1nAm/view?usp=sharing")
+# eval_path = tf.keras.utils.get_file("eval_data.csv", "https://drive.google.com/file/d/1FhWNOS7RySzmabxKrBz0SXPdZ1uoebc_/view?usp=sharing")
+
+dtrain = pd.read_csv('training_data.csv')
+data_eval = pd.read_csv('eval_data.csv')
+
+# eliminamos el campo con el resultado
+train_result = dtrain.pop('gesto')
+eval_result = data_eval.pop('gesto') 
 
 
 
-# # # Especificamos los campos
+# Especificamos los campos
 feature_columns = []
-for feature_name in NUMERIC_COLUMNS:
-  feature_columns.append(tf.feature_column.numeric_column(feature_name, dtype=tf.float32))
+for feature_name in COLUMNS:
+  feature_columns.append(tf.feature_column.numeric_column(key=feature_name))
 
 # Creacion de la funcion de input
-def make_input_fn(data_df, label_df, num_epochs=10, shuffle=True, batch_size=32):
-  def input_function():  # inner function, this will be returned
-    ds = tf.data.Dataset.from_tensor_slices((dict(data_df), label_df))  # create tf.data.Dataset object with data and its label
-    if shuffle:
-      ds = ds.shuffle(1000)  # randomize order of data
-    ds = ds.batch(batch_size).repeat(num_epochs)  # split dataset into batches of 32 and repeat process for number of epochs
-    return ds  # return a batch of the dataset
-  return input_function  # return a function object for use
+def input_fn(features, labels, training=True, batch_size=256):
+    # Convert the inputs to a Dataset.
+    dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
 
-train_input_func = make_input_fn(dtrain, y_train)  # here we will call the input_function that was returned to us to get a dataset object we can feed to the model
-eval_input_func = make_input_fn(deval, y_eval, num_epochs=1, shuffle=False)
+    # Shuffle and repeat if you are in training mode.
+    if training:
+        dataset = dataset.shuffle(1000).repeat()
+    return dataset.batch(batch_size)
 
-linear_est = tf.estimator.LinearClassifier(feature_columns=feature_columns)
+classifier = tf.estimator.DNNClassifier(
+    feature_columns = feature_columns,
+    # Two hidden layers of 30 and 10 nodes respectively.
+    hidden_units=[30, 10],
+    # The model must choose between 3 classes.
+    n_classes=3
+)
 
-linear_est.train(train_input_func)  # train
-result = linear_est.evaluate(eval_input_func)  # get model metrics/stats by testing on tetsing data
+classifier.train(
+  input_fn=lambda: input_fn(dtrain, train_result, training=True),
+  steps=5000)
 
-print(result['accuracy'])  
+eval_result = classifier.evaluate(
+  input_fn=lambda: input_fn(data_eval, eval_result, training=False)    )
+
+print('\nTest set accuracy: {accuracy:0.3f}\n'.format(**eval_result))
