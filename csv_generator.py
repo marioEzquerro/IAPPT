@@ -6,9 +6,9 @@ import mediapipe as mp
 mp_hands = mp.solutions.hands
 TRAINING_FOLDERS = ['.\\data\\train\\paper', '.\\data\\train\\scissors', '.\\data\\train\\rock']
 TESTIING_FOLDERS = ['.\\data\\test\\paper', '.\\data\\test\\scissors', '.\\data\\test\\rock']
-ROCK = 1
-PAPER = 2
-SCISSORS = 3
+ROCK = 0
+PAPER = 1
+SCISSORS = 2
 
 images = []
 
