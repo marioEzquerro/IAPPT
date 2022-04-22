@@ -1,5 +1,4 @@
 import random
-from time import sleep
 import cv2
 import mediapipe as mp
 import drawing_styles as ds
