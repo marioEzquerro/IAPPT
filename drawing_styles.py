@@ -211,11 +211,11 @@ def get_hand_landmarks_style(accion) -> Mapping[int, DrawingSpec]:
     hand_landmark_style = {}
     global hand_landmarks
 
-    if (accion == 1):
+    if (accion == 0):
         hand_landmarks = _HAND_LANDMARK_STYLE_ROCK
-    elif (accion == 2):
+    elif (accion == 1):
         hand_landmarks = _HAND_LANDMARK_STYLE_PAPER
-    elif (accion == 3):
+    elif (accion == 2):
         hand_landmarks = _HAND_LANDMARK_STYLE_SCISSORS
     else:
         hand_landmarks = _HAND_LANDMARK_STYLE
@@ -235,11 +235,11 @@ def get_hand_connections_style(accion) -> Mapping[Tuple[int, int], DrawingSpec]:
     hand_connection_style = {}
     global hand_connections
 
-    if (accion == 1):
+    if (accion == 0):
         hand_connections = _HAND_CONNECTION_STYLE_ROCK
-    elif (accion == 2):
+    elif (accion == 1):
         hand_connections = _HAND_CONNECTION_STYLE_PAPER
-    elif (accion == 3):
+    elif (accion == 2):
         hand_connections = _HAND_CONNECTION_STYLE_SCISSORS
     else:
         hand_connections = _HAND_CONNECTION_STYLE

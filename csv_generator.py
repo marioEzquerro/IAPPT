@@ -94,7 +94,7 @@ def main():
     images.clear()
     main()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
 
 
