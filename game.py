@@ -17,11 +17,11 @@ mp_drawing = mp.solutions.drawing_utils
 # Cargar el los modelos que usaremos
 mp_hands = mp.solutions.hands  
 gesture_classifier = tf.estimator.DNNClassifier(
-    feature_columns= feature_columns,
+    feature_columns=feature_columns,
     hidden_units=[32, 10],
     n_classes=3,
     optimizer=tf.keras.optimizers.Adam(lr=0.03),
-    model_dir='gesture_classifier'
+    model_dir='model'
 )
 # Entrada de video por webcam:
 camera = cv2.VideoCapture(0)
@@ -45,11 +45,11 @@ def model_predict(landmarks):
     predictions = gesture_classifier.predict(lambda: input_fn(landmarks))
 
     for pred_dict in predictions:
-        class_id = pred_dict['class_ids'][0]
-        probability = pred_dict['probabilities'][class_id]
+        return pred_dict['class_ids'][0]
+         
+        # probability = pred_dict['probabilities'][class_id]
 
-        print('Prediction is "{}" ({:.1f}%)'.format(GESTURES[class_id], 100 * probability))
-        # return class_id
+        # print('Prediction is "{}" ({:.1f}%)'.format(GESTURES[class_id], 100 * probability))
 
 # Realizar gesto de CPU y dar un ganador
 def gesto_cpu_intput(usrInpt):
@@ -93,7 +93,7 @@ def main():
             if results.multi_hand_landmarks:
                 # usamos solo el 1º elemento encontrado ya que solo trabajaremos con una mano a la vez
                 hand = results.multi_hand_landmarks[0]
-                model_predict([
+                accion = model_predict([
                     hand.landmark[0].y, hand.landmark[0].x, 
                     hand.landmark[6].y, hand.landmark[6].x,
                     hand.landmark[8].y, hand.landmark[8].x,
@@ -104,7 +104,7 @@ def main():
                     hand.landmark[18].y, hand.landmark[18].x,
                     hand.landmark[20].y, hand.landmark[20].x
                 ])
-                accion = 1
+                gesto_cpu_intput(accion)
 
 
                 # Estilizar los landmarks
