@@ -5,15 +5,14 @@ import common.constants as const
 feature_columns = []
 for label in const.LABELS:
     feature_columns.append(tf.feature_column.numeric_column(key=label))
-    
+
 # Cargar el los modelos que usaremos
 gesture_classifier = tf.estimator.DNNClassifier(
     feature_columns=feature_columns,
     hidden_units=[32, 10],
-    n_classes=3,optimizer=tf.keras.optimizers.Adam(lr=0.03),
+    n_classes=3, optimizer=tf.keras.optimizers.Adam(lr=0.03),
     model_dir='model'
 )
-
 
 def input_fn(features, batch_size=1):
     predict = {}
@@ -23,10 +22,13 @@ def input_fn(features, batch_size=1):
     return tf.data.Dataset.from_tensor_slices(predict).batch(batch_size)
 
 # Funcion para determinar gesto realizado y hacer return del resultado
+
+
 def model_predict(landmarks):
-    predictions = gesture_classifier.predict(lambda: input_fn(landmarks))    
-    for pred_dict in predictions:        
-        return pred_dict['class_ids'][0] 
+    predictions = gesture_classifier.predict(lambda: input_fn(landmarks))
+    for pred_dict in predictions:
+        return pred_dict['class_ids'][0]
+
 
 inic = time.time()
 
@@ -34,9 +36,9 @@ inic = time.time()
 
 fin = time.time()
 
-model = tf.Module(gesture_classifier)
-model.
-
-gesture_classifier.export_saved_model(export_dir_base='a', serving_input_receiver_fn=)
 print("--- %.3f seconds ---" % (fin - inic))
+
+
+
+
 
