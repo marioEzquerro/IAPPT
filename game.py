@@ -2,6 +2,7 @@ import tensorflow as tf
 import random
 import cv2
 import mediapipe as mp
+import time
 import drawing_styles as ds
 import common.constants as const
 
@@ -18,11 +19,11 @@ for label in const.LABELS:
 mp_hands = mp.solutions.hands  
 gesture_classifier = tf.estimator.DNNClassifier(
     feature_columns=feature_columns,
-    hidden_units=[32, 10],
-    n_classes=3,#optimizer=tf.keras.optimizers.Adam(lr=0.03),
-    model_dir='model'
+    hidden_units=[20, 10],
+    n_classes=3,
+    model_dir=const.MODEL_DIR
 )
-model = tf.saved_model.load
+
 # Almacenar entrada de video de webcam:
 camera = cv2.VideoCapture(0)
 
@@ -71,6 +72,7 @@ def output_winner(usrInpt):
     MAIN
 Funcion que controla la camara, encuentra y dibuja la mano y llama a model_predict con los datos recogidos
 ------------'''
+import time
 def main():
     with mp_hands.Hands(
             static_image_mode = False,
@@ -92,19 +94,22 @@ def main():
 
             if results.multi_hand_landmarks:
                 for hand in results.multi_hand_landmarks:      
-                   
+                    
                     accion = 3
-                    # accion = model_predict([
-                    #     hand.landmark[0].y, hand.landmark[0].x, 
-                    #     hand.landmark[6].y, hand.landmark[6].x,
-                    #     hand.landmark[8].y, hand.landmark[8].x,
-                    #     hand.landmark[10].y, hand.landmark[10].x,
-                    #     hand.landmark[12].y, hand.landmark[12].x,
-                    #     hand.landmark[14].y, hand.landmark[14].x,
-                    #     hand.landmark[16].y, hand.landmark[16].x,
-                    #     hand.landmark[18].y, hand.landmark[18].x,
-                    #     hand.landmark[20].y, hand.landmark[20].x
-                    # ])
+                    s = time.time()
+                    accion = model_predict([
+                        hand.landmark[0].y, hand.landmark[0].x, 
+                        hand.landmark[6].y, hand.landmark[6].x,
+                        hand.landmark[8].y, hand.landmark[8].x,
+                        hand.landmark[10].y, hand.landmark[10].x,
+                        hand.landmark[12].y, hand.landmark[12].x,
+                        hand.landmark[14].y, hand.landmark[14].x,
+                        hand.landmark[16].y, hand.landmark[16].x,
+                        hand.landmark[18].y, hand.landmark[18].x,
+                        hand.landmark[20].y, hand.landmark[20].x
+                    ])
+                    e = time.time()
+                    print('--- %.3f sec ---' % (e - s))
 
                     # Estilizar los landmarks
                     mp_drawing.draw_landmarks(
@@ -123,6 +128,7 @@ def main():
             #TODO Jugar con 'Enter'
             if cv2.waitKey(5) & 0xFF == 13:
                 print(output_winner(accion))
+
 
     camera.release()
     cv2.destroyAllWindows()

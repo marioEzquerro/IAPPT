@@ -1,3 +1,2 @@
-.dnn
-model/
-**__pycache__/
+__pycache__/
+common\__pycache__/

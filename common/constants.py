@@ -2,3 +2,4 @@ LABELS = ['muneca_Y','muneca_X','indicep_Y','indicep_X','indicet_Y','indicet_X',
 GESTURES = ['Piedra','Papel','Tijera']
 TRAINING_CSV = 'training_data.csv'
 EVALUATION_CSV = 'eval_data.csv'
+MODEL_DIR = 'model/1651130643'
