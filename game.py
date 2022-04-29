@@ -1,52 +1,37 @@
-import tensorflow as tf
 import random
 import cv2
 import mediapipe as mp
 import time
 import drawing_styles as ds
+import keras
 import common.constants as const
 
 '''------------
     VARIABLES 
 ------------'''
-mp_drawing = mp.solutions.drawing_utils
-# Preparamos una lista con los nombres de los landmarks
-feature_columns = []
-for label in const.LABELS:
-    feature_columns.append(tf.feature_column.numeric_column(key=label))
-    
 # Cargar el los modelos que usaremos
+mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands  
-gesture_classifier = tf.estimator.DNNClassifier(
-    feature_columns=feature_columns,
-    hidden_units=[20, 10],
-    n_classes=3,
-    model_dir=const.MODEL_DIR
-)
-
+gesture_classifier = keras.models.load_model('model\gesture_classifier.h5')
 # Almacenar entrada de video de webcam:
 camera = cv2.VideoCapture(0)
 
 
 '''------------
     IA
+Funcion para determinar gesto realizado y hacer return del resultado
+el metodo predict devuelve una lista del tipo [[x, y, z]] siendo cada valor
 ------------'''
-# Funcion para enviar los datos al modelo
-def input_fn(features, batch_size=1):
-    predict = {}
-    for i, label in enumerate(feature_columns):
-        predict[label] = [float(features[i])]
-
-    return tf.data.Dataset.from_tensor_slices(predict).batch(batch_size)
-
-# Funcion para determinar gesto realizado y hacer return del resultado
 def model_predict(landmarks):
-    predictions = gesture_classifier.predict(lambda: input_fn(landmarks))    
-    for pred_dict in predictions:        
-        return pred_dict['class_ids'][0] 
-
+    prediction = gesture_classifier.predict(landmarks)
+    # return [i for i, val in enumerate(prediction[0]) if val == max(prediction[0])][0]
+    for i, val in enumerate(prediction[0]):
+        if val == max(prediction[0]):
+            print('Indice enct', val ,i)
 
     
+    
+
 '''------------
     JUEGO
 Realizar gesto de CPU y dar un ganador
@@ -94,10 +79,7 @@ def main():
 
             if results.multi_hand_landmarks:
                 for hand in results.multi_hand_landmarks:      
-                    
-                    accion = 3
-                    s = time.time()
-                    accion = model_predict([
+                    accion = model_predict([[
                         hand.landmark[0].y, hand.landmark[0].x, 
                         hand.landmark[6].y, hand.landmark[6].x,
                         hand.landmark[8].y, hand.landmark[8].x,
@@ -107,9 +89,7 @@ def main():
                         hand.landmark[16].y, hand.landmark[16].x,
                         hand.landmark[18].y, hand.landmark[18].x,
                         hand.landmark[20].y, hand.landmark[20].x
-                    ])
-                    e = time.time()
-                    print('--- %.3f sec ---' % (e - s))
+                    ]])             
 
                     # Estilizar los landmarks
                     mp_drawing.draw_landmarks(
@@ -119,16 +99,15 @@ def main():
                         ds.get_hand_landmarks_style(accion),
                         ds.get_hand_connections_style(accion)
                     )
-            # Mostrar en imagen
-            cv2.imshow('IAPPT', cv2.flip(img,1))
                 
             # Detener programa al pulsar 'Esc'
             if cv2.waitKey(5) & 0xFF == 27:
                 break
-            #TODO Jugar con 'Enter'
-            if cv2.waitKey(5) & 0xFF == 13:
+            elif 0xFF == 32:
                 print(output_winner(accion))
 
+            # Mostrar en imagen
+            cv2.imshow('IAPPT', cv2.flip(img,1))
 
     camera.release()
     cv2.destroyAllWindows()

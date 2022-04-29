@@ -2,58 +2,62 @@ import csv
 import os
 import cv2
 import mediapipe as mp
+import common.constants as const
 
+'''------------
+    VARIABLES
+------------'''
 mp_hands = mp.solutions.hands
-TRAINING_FOLDERS = ['.\\data\\train\\paper', '.\\data\\train\\scissors', '.\\data\\train\\rock']
-TESTIING_FOLDERS = ['.\\data\\test\\paper', '.\\data\\test\\scissors', '.\\data\\test\\rock']
+images = []
 ROCK = 0
 PAPER = 1
 SCISSORS = 2
 
-images = []
 
-# Creamos un objeto del tipo ImageDataGenerator para transformar imagenes
-# datagen = ImageDataGenerator(
-#     rotation_range=180,
-#     horizontal_flip=True,
-#     fill_mode='nearest')
-
-# Añadir todas las imagenes a la lista
-def loadTrainingImages():
-    for folder in TRAINING_FOLDERS:
+'''------------
+    AÑADIR IMAGENES
+Segun la opcion de main() se cargan las imagenes de entrenamiento o testing
+------------'''
+def load_training_images():
+    for folder in const.TRAINING_FOLDERS:
         for file in os.listdir(folder):
                 images.append(os.path.join(folder, file))
-    saveData('training_data.csv')
+    save_to_csv(const.TRAINING_CSV)
     
-def loadTestingImages():
-    for folder in TESTIING_FOLDERS:
+
+def load_testing_images():
+    for folder in const.TESTIING_FOLDERS:
         for file in os.listdir(folder):
             images.append(os.path.join(folder, file))
-    saveData('eval_data.csv')
+    save_to_csv(const.EVALUATION_CSV)
     
-# leer landmarks y guardarlas
-def saveData(name):
-    print('Generando csv...')   
+
+'''------------
+    GUARDAR LANDMAKS
+Lee las imagenes de los ficheros y extrae las coordenadas para luego
+guardarlas en la ubicacion especificada
+------------'''
+def save_to_csv(name):
     with mp_hands.Hands(
             static_image_mode = True,
             model_complexity = 0,
             max_num_hands = 1,
             min_detection_confidence = 0.5) as hands:
         
-        # abrimos archivo para escribir en él 
+        # Abrimos archivo para escribir en él 
         with open(name, 'w') as df:
             writer = csv.writer(df, delimiter=',', lineterminator='\n')
-            # escribimos los nombres de los campos
+            # Escribimos los nombres de los campos
             writer.writerow(['gesto','muneca_Y','muneca_X','indicep_Y','indicep_X','indicet_Y','indicet_X','corazonp_Y','corazonp_X','corazont_Y','corazont_X','anularp_Y','anularp_X','anulart_Y','anulart_X','meniquep_Y','meniquep_X','meniquet_Y','meniquet_X'])
 
             for idx, file in enumerate(images):
                 print(f'Convirtiendo: {file}')
                 # Leer imagen y voltear horizontalmente 
                 img = cv2.flip(cv2.imread(file), 1)
-                # Convertir de BGR a RGB antes de procesar
+                # Convertir de BGR a RGB y procesar imagen
                 results = hands.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 
-                # determinar que imagen se esta procesando via el path en el que esta guardado
+                # Seleccionar que pose tiene la imagen gracias al nombre de la carpeta
                 if 'rock' in file:
                     action = ROCK
                 elif 'paper' in file:
@@ -62,9 +66,8 @@ def saveData(name):
                     action = SCISSORS
 
                 if results.multi_hand_landmarks:
-                    # Usamos solo el primer elemento del array que contiene las manos encontradas
+                    # Usamos solo el primer elemento del array ya que solo hay 1 mano
                     hand = results.multi_hand_landmarks[0]
-                    
                     # Escribir landmarks de la mano
                     writer.writerow([action,
                         hand.landmark[0].y, hand.landmark[0].x, 
@@ -78,14 +81,18 @@ def saveData(name):
                         hand.landmark[20].y, hand.landmark[20].x
                     ])
         
-       
+        
+'''------------
+    MAIN
+Controla el menu del usuario y sus acciones
+------------'''
 def main():
     opc = input('\n--- Selecciona opcion ---\n1. Generar csv para el entrenamiento\n2. Generar csv de testing\n3. Salir\n> ')
     
     if opc == '1':
-        loadTrainingImages()
+        load_training_images()
     elif opc == '2':
-        loadTestingImages()
+        load_testing_images()
     elif opc == '3':
         return
     else:
@@ -96,18 +103,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# -- AUGMENTACION -----------------
-# test_img = cv2.imread(IMAGE_FILES[0]) # Elegir imagen para transformar
-# img = img_to_array(test_img)  # convert image to numpy arry
-# img = img.reshape((1,) + img.shape)  # reshape image
-
-# i = 0
-# # bach es cada una de las imagenes augmentadas
-# for batch in datagen.flow(img, save_to_dir='aug', save_prefix='test_', save_format='jpeg'):  # this loops runs forever until we break, saving images to current directory with specified prefix
-#     i += 1
-#     if i > 1:  # Aplicar n veces por imagen
-#         break
-
-# ---------------------------------
