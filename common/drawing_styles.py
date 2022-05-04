@@ -38,7 +38,6 @@ _THICKNESS_WRIST_MCP = 3
 _THICKNESS_FINGER = 2
 _THICKNESS_DOT = -1
 
-# Landmarks
 _PALM_LANMARKS = (HandLandmark.WRIST, HandLandmark.THUMB_CMC,
                   HandLandmark.INDEX_FINGER_MCP, HandLandmark.MIDDLE_FINGER_MCP,
                   HandLandmark.RING_FINGER_MCP, HandLandmark.PINKY_MCP)
@@ -58,27 +57,6 @@ _PINKY_FINGER_LANDMARKS = (HandLandmark.PINKY_PIP, HandLandmark.PINKY_DIP,
 
 # DIFERENTES ESTILOS POR CADA GESTO
 # Landmarks
-_HAND_LANDMARK_STYLE = {
-    _PALM_LANMARKS:
-        DrawingSpec(
-            color=_RED, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-    _THUMP_LANDMARKS:
-        DrawingSpec(
-            color=_PEACH, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-    _INDEX_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_PURPLE, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-    _MIDDLE_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_YELLOW, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-    _RING_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_GREEN, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-    _PINKY_FINGER_LANDMARKS:
-        DrawingSpec(
-            color=_BLUE, thickness=_THICKNESS_DOT, circle_radius=_RADIUS),
-}
-
 _HAND_LANDMARK_STYLE_ROCK = {
     _PALM_LANMARKS:
         DrawingSpec(
@@ -141,21 +119,6 @@ _HAND_LANDMARK_STYLE_SCISSORS = {
 }
 
 # Conexiones de la mano
-_HAND_CONNECTION_STYLE = {
-    hands_connections.HAND_PALM_CONNECTIONS:
-        DrawingSpec(color=_GRAY, thickness=_THICKNESS_WRIST_MCP),
-    hands_connections.HAND_THUMB_CONNECTIONS:
-        DrawingSpec(color=_PEACH, thickness=_THICKNESS_FINGER),
-    hands_connections.HAND_INDEX_FINGER_CONNECTIONS:
-        DrawingSpec(color=_PURPLE, thickness=_THICKNESS_FINGER),
-    hands_connections.HAND_MIDDLE_FINGER_CONNECTIONS:
-        DrawingSpec(color=_YELLOW, thickness=_THICKNESS_FINGER),
-    hands_connections.HAND_RING_FINGER_CONNECTIONS:
-        DrawingSpec(color=_GREEN, thickness=_THICKNESS_FINGER),
-    hands_connections.HAND_PINKY_FINGER_CONNECTIONS:
-        DrawingSpec(color=_BLUE, thickness=_THICKNESS_FINGER)
-}
-
 _HAND_CONNECTION_STYLE_ROCK = {
     hands_connections.HAND_PALM_CONNECTIONS:
         DrawingSpec(color=_GRAY, thickness=_THICKNESS_WRIST_MCP),
@@ -215,10 +178,9 @@ def get_hand_landmarks_style(accion) -> Mapping[int, DrawingSpec]:
         hand_landmarks = _HAND_LANDMARK_STYLE_ROCK
     elif (accion == 1):
         hand_landmarks = _HAND_LANDMARK_STYLE_PAPER
-    elif (accion == 2):
-        hand_landmarks = _HAND_LANDMARK_STYLE_SCISSORS
     else:
-        hand_landmarks = _HAND_LANDMARK_STYLE
+        hand_landmarks = _HAND_LANDMARK_STYLE_SCISSORS
+
 
     for k, v in hand_landmarks.items():
         for landmark in k:
@@ -239,10 +201,8 @@ def get_hand_connections_style(accion) -> Mapping[Tuple[int, int], DrawingSpec]:
         hand_connections = _HAND_CONNECTION_STYLE_ROCK
     elif (accion == 1):
         hand_connections = _HAND_CONNECTION_STYLE_PAPER
-    elif (accion == 2):
-        hand_connections = _HAND_CONNECTION_STYLE_SCISSORS
     else:
-        hand_connections = _HAND_CONNECTION_STYLE
+        hand_connections = _HAND_CONNECTION_STYLE_SCISSORS
 
     for k, v in hand_connections.items():
         for connection in k:

@@ -1,3 +1,4 @@
+from cProfile import label
 import csv
 import os
 import cv2
@@ -48,7 +49,9 @@ def save_to_csv(name):
         with open(name, 'w') as df:
             writer = csv.writer(df, delimiter=',', lineterminator='\n')
             # Escribimos los nombres de los campos
-            writer.writerow(['gesto','muneca_Y','muneca_X','indicep_Y','indicep_X','indicet_Y','indicet_X','corazonp_Y','corazonp_X','corazont_Y','corazont_X','anularp_Y','anularp_X','anulart_Y','anulart_X','meniquep_Y','meniquep_X','meniquet_Y','meniquet_X'])
+            labels = const.LABELS
+            labels.insert(0, 'GESTO')
+            writer.writerow(labels)
 
             for idx, file in enumerate(images):
                 print(f'Convirtiendo: {file}')
