@@ -1,14 +1,19 @@
-import random
 import cv2
-import mediapipe as mp
-import common.drawing_styles as ds
-import common.constants as const
 import keras
+import random
+import tkinter as tk  
+import mediapipe as mp
+import common.constants as const
+import common.drawing_styles as ds
 
 '''------------
     VARIABLES 
 ------------'''
 scores = [0, 0]
+# Variables ventana
+window = tk.Tk()
+window.title('IAPPT MENU')
+window.resizable(width=False, height=False)
 # Cargar el los modelos que usaremos
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands  
@@ -28,21 +33,30 @@ def model_predict(landmarks):
     return [i for i, val in enumerate(predictions[0]) if val == max(predictions[0])][0]
 
 
+def update_scores(jugador):
+    scores[jugador] += 1
+
+    if (scores[jugador] == 5):
+        # TODO mostrar ganador y cerrar cv2
+        camera.release()
+        cv2.destroyAllWindows()
+        
+
 '''------------
     JUEGO
 Realizar gesto de CPU y dar un ganador
 ------------'''
 def output_winner(usr_inpt):
     cpu_inpt =  random.randrange(0,3)
-    usr_winning_conditions = [usr_inpt == 0 and cpu_inpt == 2 or usr_inpt == 1 and cpu_inpt ==   0 or usr_inpt == 2 and cpu_inpt == 1]
+    usr_winning_conditions = [usr_inpt == 0 and cpu_inpt == 2 or usr_inpt == 1 and cpu_inpt == 0 or usr_inpt == 2 and cpu_inpt == 1]
  
     if usr_inpt == cpu_inpt:
         return f'Empate (tu:{const.GESTURES[usr_inpt]} vs cpu:{const.GESTURES[cpu_inpt]})'
     elif any(usr_winning_conditions):
-        scores[1] += 1
+        update_scores(1)
         return f'GANASTE (tu:{const.GESTURES[usr_inpt]} vs cpu:{const.GESTURES[cpu_inpt]})'
     else:
-        scores[0] += 1
+        update_scores(0)
         return f'cpu gana (tu:{const.GESTURES[usr_inpt]} vs cpu:{const.GESTURES[cpu_inpt]})'
     
     
@@ -101,11 +115,39 @@ def main():
             img = cv2.flip(img,1)
             cv2.putText(img, f'CPU:{scores[0]} TU:{scores[1]}', (40, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 1)             
             # Mostrar en imagen
-            cv2.imshow('PPT GAME', img) 
+            cv2.imshow('IAPPT GAME', img) 
 
     camera.release()
     cv2.destroyAllWindows()
 
 
+'''------------
+    GUI
+Funcion para crear y visualizar la ventana y sus elementos
+------------'''
+def GUI():
+    desc = tk.Label(window, text='Bienvenido a PPT, para jugar asegurate de tener una webcam conectada,\nsi el programa no reconoce bien tus gestos acercate más a la camara.')
+    opciones = tk.Label(window, text='Segun el gesto detectado se coloreará:') # Piedra
+    gesto1 = tk.Label(window, text='PIEDRA', bg='#808080') # Piedra
+    gesto2 = tk.Label(window, text='PAPEL', bg='#ffe5b4') # Papel
+    gesto3 = tk.Label(window, text='TIJERA', bg='#ff8c00') # Tijera
+    desc2 = tk.Label(window, text='Despues pulsa "espacio" para el ver resultado, gana el que llegue a 5ptos.\nPara jugar pulsa el botón:')
+    jugar = tk.Button(window, text='JUGAR', command=main)
+
+    # Posicionamiento de elementos
+    desc.grid(columnspan=3, row=0, padx=10, pady=10)
+    
+    opciones.grid(columnspan=3, row=1, pady=(0,5))
+    gesto1.grid(column=0, row=2)
+    gesto2.grid(column=1, row=2)
+    gesto3.grid(column=2, row=2)
+
+    desc2.grid(columnspan=3, row=3, pady=(20,2))
+    jugar.grid(columnspan=3, row=4, pady=(10,20))
+
+    # Arrancar ventanta
+    window.mainloop()   
+
+
 if __name__ == '__main__':
-    main()
+    GUI()
