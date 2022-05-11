@@ -1,7 +1,6 @@
-from cProfile import label
-import csv
 import os
 import cv2
+import csv
 import mediapipe as mp
 import common.constants as const
 
@@ -11,8 +10,7 @@ import common.constants as const
 mp_hands = mp.solutions.hands
 images = []
 ROCK = 0
-PAPER = 1
-SCISSORS = 2
+
 
 
 '''------------
@@ -62,11 +60,11 @@ def save_to_csv(name):
                 
                 # Seleccionar que pose tiene la imagen gracias al nombre de la carpeta
                 if 'rock' in file:
-                    action = ROCK
+                    action = const.ROCK
                 elif 'paper' in file:
-                    action = PAPER
+                    action = const.PAPER
                 else: 
-                    action = SCISSORS
+                    action = const.SCISSORS
 
                 if results.multi_hand_landmarks:
                     # Usamos solo el primer elemento del array ya que solo hay 1 mano
