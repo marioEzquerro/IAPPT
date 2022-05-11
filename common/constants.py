@@ -13,6 +13,7 @@ TRAINING_FOLDERS = ['.\\data\\train\\paper', '.\\data\\train\\scissors', '.\\dat
 TESTIING_FOLDERS = ['.\\data\\test\\paper', '.\\data\\test\\scissors', '.\\data\\test\\rock']
 TRAINING_CSV = '.\\data\\training_data.csv'
 EVALUATION_CSV = '.\\data\\eval_data.csv'
+MAX_SCORE = 5
 ROCK = 0
 PAPER = 1
 SCISSORS = 2
