@@ -6,7 +6,7 @@ import mediapipe as mp
 import tkinter.messagebox
 import common.constants as const
 import common.drawing_styles as ds
-import keyboard
+
 '''------------
     VARIABLES 
 ------------'''
@@ -34,7 +34,6 @@ def model_predict(landmarks):
     return [i for i, val in enumerate(predictions[0]) if val == max(predictions[0])][0]
 
 
-
 '''------------
     RESTORE
 Restaurar el juego al estado inicial.
@@ -44,6 +43,7 @@ def restore_game(camera):
     scores['cpu'] = 0
     camera.release()
     cv2.destroyAllWindows()
+
 
 '''------------
     SCORES
