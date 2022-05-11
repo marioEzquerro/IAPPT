@@ -4,7 +4,7 @@ los frameworks de OpenCV y TensorFlow. Para jugar ejecuta game.py.
 
 ## REQUERIMIENTOS
 Para poder ejecutar los ficheros de este proyecto necesitaremos instalar mediante comandos:
--curl https://bootstrap.pypa.io/get-pip.py -o get-pippy
+- curl https://bootstrap.pypa.io/get-pip.py -o get-pippy
 - python .\get-pip.py
 - pip install opencv-python
 - pip install ipykernel
