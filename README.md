@@ -1,5 +1,7 @@
 # IAPPT
-Trabajo de fin de grado que utiliza IA para poder jugar a piedra, papel o tijera gracias a una webcam.
+Trabajo de fin de grado que utiliza IA para poder jugar a piedra, papel o tijera gracias a una webcam. Usando 
+los frameworks de OpenCV y TensorFlow.
+Para jugar ejecuta game.py.
 
 # Descripción de ficheros
 - `game.py` Fichero ejectutable con el juego de PPT.
