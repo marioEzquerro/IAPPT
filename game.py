@@ -28,15 +28,13 @@ El metodo predict devuelve una lista de resultados tipo [[% piedra, % papel, % t
 aqui obtenemos el indice de la primera prediccion con mejor probabilidad.
 ------------'''
 def model_predict(landmarks):
-    if landmarks is None:
-        return -1
     predictions = gesture_classifier.predict(landmarks)
     return [i for i, val in enumerate(predictions[0]) if val == max(predictions[0])][0]
 
 
 '''------------
     RESTORE
-Restaurar el juego al estado inicial.
+Resetear puntuaciones y cerrar la ventana respectiva.
 ------------'''
 def restore_game(camera):
     scores['usr'] = 0
@@ -63,10 +61,6 @@ def update_scores(jugador, camera):
 Realizar gesto aleatorio para CPU y dar un ganador segun las reglas de PPT.
 ------------'''
 def output_winner(camera, usr_inpt = -1):
-    # Salir si no se recibe ningun gesto
-    if usr_inpt == -1:
-        return
-
     cpu_inpt =  random.randrange(0,3)
     usr_winning_conditions = [
         usr_inpt == const.ROCK and cpu_inpt == const.SCISSORS or 
@@ -130,19 +124,18 @@ def main(camera):
                         ds.get_hand_landmarks_style(accion),          
                         ds.get_hand_connections_style(accion)
                     ) 
-            
+
+                # Mostrar resultado al pulsar 'espacio' mientras detecte mano
+                if cv2.waitKey(5) == 32:
+                    print(output_winner(camera, accion))
 
             img = cv2.flip(img,1)
             # Mostrar en imagen y texto
             cv2.putText(img, f'TU:{scores["usr"]} CPU:{scores["cpu"]}', (40, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 1)             
             cv2.imshow('IAPPT GAME', img) 
 
-            # Mostrar resultado al pulSar 'espacio'
-            wait_key = cv2.waitKey(5)
-            if wait_key == 32:
-                print(output_winner(camera, accion))
             # Salir al pulsar 'espacio'
-            if wait_key == 27:
+            if cv2.waitKey(5) == 27:
                 restore_game(camera)
                 break
 
