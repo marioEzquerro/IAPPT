@@ -9,34 +9,25 @@ import common.constants as const
 ------------'''
 mp_hands = mp.solutions.hands
 images = []
-ROCK = 0
-
 
 
 '''------------
     AÑADIR IMAGENES
-Segun la opcion de main() se cargan las imagenes de entrenamiento o testing
+Segun la opcion de main() se cargan las imagenes de entrenamiento o testing.
 ------------'''
-def load_training_images():
-    for folder in const.TRAINING_FOLDERS:
-        for file in os.listdir(folder):
-                images.append(os.path.join(folder, file))
-    save_to_csv(const.TRAINING_CSV)
-    
-
-def load_testing_images():
-    for folder in const.TESTIING_FOLDERS:
+def load_images(image_folders, path):
+    for folder in image_folders:
         for file in os.listdir(folder):
             images.append(os.path.join(folder, file))
-    save_to_csv(const.EVALUATION_CSV)
-    
+    save_to_csv(path)
+
 
 '''------------
     GUARDAR LANDMAKS
 Lee las imagenes de los ficheros y extrae las coordenadas para luego
-guardarlas en la ubicacion especificada
+guardarlas en la ubicacion especificada.
 ------------'''
-def save_to_csv(name):
+def save_to_csv(path):
     with mp_hands.Hands(
             static_image_mode = True,
             model_complexity = 0,
@@ -44,7 +35,7 @@ def save_to_csv(name):
             min_detection_confidence = 0.5) as hands:
         
         # Abrimos archivo para escribir en él 
-        with open(name, 'w') as df:
+        with open(path, 'w') as df:
             writer = csv.writer(df, delimiter=',', lineterminator='\n')
             # Escribimos los nombres de los campos
             labels = const.LABELS
@@ -85,15 +76,15 @@ def save_to_csv(name):
         
 '''------------
     MAIN
-Controla el menu del usuario y sus acciones
+Controla el menu del usuario y sus acciones.
 ------------'''
 def main():
     opc = input('\n--- Selecciona opcion ---\n1. Generar csv para el entrenamiento\n2. Generar csv de testing\n3. Salir\n> ')
     
     if opc == '1':
-        load_training_images()
+        load_images(const.TRAINING_FOLDERS, const.TRAINING_CSV)
     elif opc == '2':
-        load_testing_images()
+        load_images(const.TESTIING_FOLDERS, const.TESTIING_FOLDERS)
     elif opc == '3':
         return
     else:
