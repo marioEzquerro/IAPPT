@@ -84,7 +84,7 @@ def main():
     if opc == '1':
         load_images(const.TRAINING_FOLDERS, const.TRAINING_CSV)
     elif opc == '2':
-        load_images(const.TESTIING_FOLDERS, const.TESTIING_FOLDERS)
+        load_images(const.TESTIING_FOLDERS, const.EVALUATION_CSV)
     elif opc == '3':
         return
     else:
