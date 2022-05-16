@@ -42,7 +42,7 @@ def save_to_csv(path):
             labels.insert(0, 'GESTO')
             writer.writerow(labels)
 
-            for idx, file in enumerate(images):
+            for file in images:
                 print(f'Convirtiendo: {file}')
                 # Leer imagen y voltear horizontalmente 
                 img = cv2.flip(cv2.imread(file), 1)
