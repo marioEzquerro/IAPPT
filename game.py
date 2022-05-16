@@ -36,11 +36,9 @@ def model_predict(landmarks):
     RESTORE
 Resetear puntuaciones y cerrar la ventana respectiva.
 ------------'''
-def restore_game(camera):
+def restore_game():
     scores['usr'] = 0
     scores['cpu'] = 0
-    camera.release()
-    cv2.destroyAllWindows()
 
 
 '''------------
@@ -53,7 +51,7 @@ def update_scores(jugador, camera):
     # Acabar el juego y reiniciar valores
     if (scores[jugador] == const.MAX_SCORE):
         tkinter.messagebox.showinfo("IAPPT", "GANASTE JUGADOR!") if (jugador == 'usr') else tkinter.messagebox.showinfo("IAPPT", "PERDISTE")
-        restore_game(camera)
+        restore_game()
        
         
 '''------------
@@ -126,7 +124,7 @@ def main(camera):
                     ) 
 
                 # Mostrar resultado al pulsar 'espacio' mientras detecte mano
-                if cv2.waitKey(5) == 32:
+                if cv2.waitKey(2) == 32:
                     print(output_winner(camera, accion))
 
             img = cv2.flip(img,1)
@@ -135,9 +133,12 @@ def main(camera):
             cv2.imshow('IAPPT GAME', img) 
 
             # Salir al pulsar 'espacio'
-            if cv2.waitKey(5) == 27:
-                restore_game(camera)
+            if cv2.waitKey(2) == 27:
+                restore_game()
                 break
+
+        camera.release()
+        cv2.destroyAllWindows()
 
 
 '''------------
