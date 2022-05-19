@@ -18,25 +18,30 @@ window.resizable(width=False, height=False)
 # Cargar el los modelos que usaremos
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands  
-gesture_classifier = keras.models.load_model("model\\gesture_classifier.h5")
 
 
 '''------------
     IA
 Funcion para determinar gesto realizado y hacer return del resultado.
 El metodo predict devuelve una lista de resultados tipo [[% piedra, % papel, % tijera], [...]] 
-aqui obtenemos el indice de la primera prediccion con mejor probabilidad.
+aqui obtenemos la prediccion con mayor probabilidad.
 ------------'''
+gesture_classifier = keras.models.load_model("model\\gesture_classifier.h5")
 def model_predict(landmarks):
     predictions = gesture_classifier.predict(landmarks)
     return [i for i, val in enumerate(predictions[0]) if val == max(predictions[0])][0]
 
 
 '''------------
-    RESTORE
-Resetear puntuaciones y cerrar la ventana respectiva.
+    END GAME
+Mostrar popup con el ganador y resetear puntuaciones.
 ------------'''
-def restore_game():
+def end_game(winner):
+    if (winner == 'usr'):
+        tkinter.messagebox.showinfo("IAPPT", "GANASTE JUGADOR!") 
+    elif (winner == 'cpu'): 
+        tkinter.messagebox.showinfo("IAPPT", "PERDISTE")
+
     scores['usr'] = 0
     scores['cpu'] = 0
 
@@ -45,21 +50,19 @@ def restore_game():
     SCORES
 Actualizar las puntuaciones y dar ganador si 'usr' o 'cpu' llegan a 5 puntos.
 ------------'''
-def update_scores(jugador, camera):
+def update_scores(jugador):
     scores[jugador] += 1
 
-    # Acabar el juego y reiniciar valores
     if (scores[jugador] == const.MAX_SCORE):
-        tkinter.messagebox.showinfo("IAPPT", "GANASTE JUGADOR!") if (jugador == 'usr') else tkinter.messagebox.showinfo("IAPPT", "PERDISTE")
-        restore_game()
+        end_game(jugador)
        
         
 '''------------
     JUEGO
 Realizar gesto aleatorio para CPU y dar un ganador segun las reglas de PPT.
 ------------'''
-def output_winner(camera, usr_inpt = -1):
-    cpu_inpt =  random.randrange(0,3)
+def output_winner(usr_inpt):
+    cpu_inpt = random.randrange(0,3)
     usr_winning_conditions = [
         usr_inpt == const.ROCK and cpu_inpt == const.SCISSORS or 
         usr_inpt == const.PAPER and cpu_inpt == const.ROCK or
@@ -69,10 +72,10 @@ def output_winner(camera, usr_inpt = -1):
     if usr_inpt == cpu_inpt:
         return f'Empate (tu:{const.GESTURES[usr_inpt]} vs cpu:{const.GESTURES[cpu_inpt]})'
     elif any(usr_winning_conditions):
-        update_scores('usr', camera)
+        update_scores('usr')
         return f'GANASTE (tu:{const.GESTURES[usr_inpt]} vs cpu:{const.GESTURES[cpu_inpt]})'
     else:
-        update_scores('cpu', camera)
+        update_scores('cpu')
         return f'cpu gana (tu:{const.GESTURES[usr_inpt]} vs cpu:{const.GESTURES[cpu_inpt]})'
     
     
@@ -124,17 +127,17 @@ def main(camera):
                     ) 
 
                 # Mostrar resultado al pulsar 'espacio' mientras detecte mano
-                if cv2.waitKey(2) == 32:
-                    print(output_winner(camera, accion))
+                if cv2.waitKey(1) == 32:
+                    print(output_winner(accion))
 
             img = cv2.flip(img,1)
             # Mostrar en imagen y texto
             cv2.putText(img, f'TU:{scores["usr"]} CPU:{scores["cpu"]}', (40, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 1)             
             cv2.imshow('IAPPT GAME', img) 
 
-            # Salir al pulsar 'espacio'
-            if cv2.waitKey(2) == 27:
-                restore_game()
+            # Salir al pulsar 'esc'
+            if cv2.waitKey(5) == 27:
+                end_game(None)
                 break
 
         camera.release()
@@ -147,23 +150,23 @@ Funcion para crear y visualizar la ventana y sus elementos.
 ------------'''
 def GUI():
     desc = tk.Label(window, text='Bienvenido a PPT, para jugar asegurate de tener una webcam conectada,\nsi el programa no reconoce bien tus gestos acercate más a la camara.')
-    opciones = tk.Label(window, text='Segun el gesto detectado se coloreará:')
-    gesto1 = tk.Label(window, text='PIEDRA', bg='#808080') 
-    gesto2 = tk.Label(window, text='PAPEL', bg='#ffe5b4') 
-    gesto3 = tk.Label(window, text='TIJERA', bg='#ff8c00') 
+    labelDesc = tk.Label(window, text='Segun el gesto detectado se coloreará:')
+    label1 = tk.Label(window, text='PIEDRA', bg='#808080') 
+    label2 = tk.Label(window, text='PAPEL', bg='#ffe5b4') 
+    label3 = tk.Label(window, text='TIJERA', bg='#ff8c00') 
     desc2 = tk.Label(window, text='Pulsa "espacio" para jugar una ronda o "esc" para salir.\nGana el que llegue a 5ptos.')
-    jugar = tk.Button(window, text='JUGAR', command=lambda: main(camera = cv2.VideoCapture(0)))
+    play = tk.Button(window, text='JUGAR', command=lambda: main(cv2.VideoCapture(0)))
 
     # Posicionamiento de elementos
     desc.grid(columnspan=3, row=0, padx=10, pady=10)
     
-    opciones.grid(columnspan=3, row=1, pady=(0,5))
-    gesto1.grid(column=0, row=2)
-    gesto2.grid(column=1, row=2)
-    gesto3.grid(column=2, row=2)
+    labelDesc.grid(columnspan=3, row=1, pady=(0,5))
+    label1.grid(column=0, row=2)
+    label2.grid(column=1, row=2)
+    label3.grid(column=2, row=2)
 
     desc2.grid(columnspan=3, row=3, pady=(20,2))
-    jugar.grid(columnspan=3, row=4, pady=(10,20))
+    play.grid(columnspan=3, row=4, pady=(10,20))
 
     # Arrancar ventanta
     window.mainloop()   
