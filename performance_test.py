@@ -64,6 +64,3 @@ for landmarks in data:
     tiempos.append(e-s)
 
 print(f'\nMedia 5 predicciones (): {mean(tiempos):.3f}s avg')
-
-
-print("\n"*10)
