@@ -10,7 +10,7 @@ Obtener pip para instalar librerias python
 curl https://bootstrap.pypa.io/get-pip.py -o get-pippy
 ```
 ```shell
-python get-pip
+python get-pippy
 ```
 
 Librerias utilizadas:
