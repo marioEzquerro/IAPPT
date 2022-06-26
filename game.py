@@ -1,6 +1,7 @@
 import cv2
 import keras
 import random
+import numpy as np
 import tkinter as tk  
 import mediapipe as mp
 import tkinter.messagebox
@@ -29,7 +30,7 @@ aqui obtenemos la prediccion con mayor probabilidad.
 gesture_classifier = keras.models.load_model("model\\gesture_classifier.h5")
 def model_predict(landmarks):
     predictions = gesture_classifier.predict(landmarks)
-    return [i for i, val in enumerate(predictions[0]) if val == max(predictions[0])][0]
+    return np.argmax(predictions) 
 
 
 '''------------
@@ -151,8 +152,8 @@ Funcion para crear y visualizar la ventana y sus elementos.
 def GUI():
     desc = tk.Label(window, text='Bienvenido a PPT, para jugar asegurate de tener una webcam conectada,\nsi el programa no reconoce bien tus gestos acercate más a la camara.')
     labelDesc = tk.Label(window, text='Segun el gesto detectado se coloreará:')
-    label1 = tk.Label(window, text='PIEDRA', bg='#808080') 
-    label2 = tk.Label(window, text='PAPEL', bg='#ffe5b4') 
+    label1 = tk.Label(window, text='PIEDRA', bg='#6e6e6e') 
+    label2 = tk.Label(window, text='PAPEL', bg='#ffffff') 
     label3 = tk.Label(window, text='TIJERA', bg='#ff8c00') 
     desc2 = tk.Label(window, text='Pulsa "espacio" para jugar una ronda o "esc" para salir.\nGana el que llegue a 5ptos.')
     play = tk.Button(window, text='JUGAR', command=lambda: main(cv2.VideoCapture(0)))
