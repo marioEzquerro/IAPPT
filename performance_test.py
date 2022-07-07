@@ -39,8 +39,7 @@ dnn_classifier =  tf.estimator.DNNClassifier(
     feature_columns= feature_columns,
     hidden_units=[32, 10],
     n_classes=3,
-    optimizer='Adam',
-    model_dir='model\\1653892692\\saved_model'
+    optimizer='Adam'
 )
 
 
@@ -52,15 +51,19 @@ keras_model = keras.models.load_model("model\\gesture_classifier.h5")
 
 '''
 COMPROBACION
+Usar unicamente 1 de las 2 opciones
 '''
 tiempos = []
 for landmarks in data:
     s = time.time()
 
+    # 1. Prediccion usando DNNClassifier
     dnnc_predict(landmarks)
-    # keras_model.predict([landmarks])
+    
+    # 2. Prediccion usando el modelo secuencial
+    #keras_model.predict([landmarks])
     
     e = time.time()
     tiempos.append(e-s)
 
-print(f'\nMedia 5 predicciones (): {mean(tiempos):.3f}s avg')
+print(f'\nTiempo 5 predicciones: {mean(tiempos):.3f}s avg')

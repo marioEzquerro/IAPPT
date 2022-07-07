@@ -34,7 +34,8 @@ pip install pandas
 ### DESCRIPCION DE FICHEROS
 - `game.py` Fichero ejectutable con el juego de PPT.
 - `csv_generator.py` Fichero ejecutable para genererar un csv de entrenamiento/evaluacion con las imagenes en data/.
-- `data/` Carpeta con las imagenes y lso csv para el modelo.
+- `performance_test` Fichero demostrando la superioridad del modelo secuencial vs DNNClassifier.
+- `data/` Carpeta con las imagenes y los csv para el modelo.
 - `model/` Carpeta donde se almacena el modelo una vez entrenado.
 - `v2_IAPPY.ipynb` Jupyter Notebook que contiene la creacion, entrenamiento y validacion del modelo.
-  - `IAPPT.ipynb` (depricated).  
+  - `IAPPT.ipynb` (depricated) rendimiento de modelo pesimo.  
